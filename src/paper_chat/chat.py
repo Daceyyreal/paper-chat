@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from . import Chunk
-from .config import GROQ_MODEL, TOP_K
+from .config import GEMINI_MODEL, GROQ_MODEL, LLM_PROVIDER, TOP_K
 from .store import Embedder, VectorStore
 
 
@@ -85,3 +85,35 @@ class GroqLLM:
             temperature=0.2,
         )
         return resp.choices[0].message.content or ""
+
+
+class GeminiLLM:
+    """Real LLM backed by the Google Gemini API (lazy import; reads GEMINI_API_KEY)."""
+
+    def __init__(self, model: str = GEMINI_MODEL) -> None:
+        import os
+
+        import google.generativeai as genai  # lazy
+
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError("Set GEMINI_API_KEY (or GOOGLE_API_KEY) to use the Gemini backend.")
+        genai.configure(api_key=api_key)
+        self._model = genai.GenerativeModel(model)
+
+    def complete(self, prompt: str) -> str:
+        resp = self._model.generate_content(
+            prompt,
+            generation_config={"temperature": 0.2},
+        )
+        return resp.text or ""
+
+
+def make_llm(provider: str = LLM_PROVIDER) -> LLM:
+    """Construct the configured chat backend. Override with PC_LLM_PROVIDER."""
+    provider = provider.lower()
+    if provider == "gemini":
+        return GeminiLLM()
+    if provider == "groq":
+        return GroqLLM()
+    raise ValueError(f"Unknown PC_LLM_PROVIDER {provider!r} (expected 'groq' or 'gemini').")

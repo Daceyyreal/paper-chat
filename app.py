@@ -13,7 +13,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from paper_chat import config, ingest
-from paper_chat.chat import GroqLLM, answer
+from paper_chat.chat import answer, make_llm
 from paper_chat.store import SentenceTransformerEmbedder, VectorStore
 
 load_dotenv()
@@ -63,7 +63,7 @@ if question:
         with st.chat_message("user"):
             st.write(question)
         with st.chat_message("assistant"), st.spinner("Thinking…"):
-            result = answer(question, store, get_embedder(), GroqLLM())
+            result = answer(question, store, get_embedder(), make_llm())
             st.write(result.text)
             if result.sources:
                 with st.expander(f"Sources ({len(result.cited)} cited)"):

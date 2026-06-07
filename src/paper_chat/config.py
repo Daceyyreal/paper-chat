@@ -7,9 +7,16 @@ import os
 # Local embedding model (downloaded once from Hugging Face on first run).
 EMBED_MODEL = os.getenv("PC_EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
 
+# Which chat backend to use: "groq" (default) or "gemini".
+LLM_PROVIDER = os.getenv("PC_LLM_PROVIDER", "groq").lower()
+
 # Groq chat model. Check https://console.groq.com/docs/models for the current
 # list; names change. llama-3.3-70b-versatile is a solid default.
 GROQ_MODEL = os.getenv("PC_GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# Gemini chat model. See https://ai.google.dev/gemini-api/docs/models for the
+# current list. gemini-2.0-flash is fast and free-tier friendly.
+GEMINI_MODEL = os.getenv("PC_GEMINI_MODEL", "gemini-2.0-flash")
 
 # Retrieval + chunking.
 TOP_K = int(os.getenv("PC_TOP_K", "5"))
