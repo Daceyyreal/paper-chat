@@ -12,9 +12,9 @@ claim points back to the source paper and page**. Built to actually use on a
 real literature pile — including cross-paper questions like *"how does my method
 differ from FlexGaussian?"*
 
-Runs on a free tier: [Groq](https://console.groq.com) for generation, local
-[sentence-transformers](https://www.sbert.net/) embeddings (no embedding API
-bill), and a numpy vector store (no database to stand up).
+Runs on a free tier: **Groq or Gemini** for generation (set `PC_LLM_PROVIDER`), local
+[sentence-transformers](https://www.sbert.net/) embeddings (no embedding API bill), and a
+numpy vector store (no database to stand up).
 
 ## Why it's not just another RAG demo
 
