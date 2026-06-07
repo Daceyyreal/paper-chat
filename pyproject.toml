@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "paper-chat"
+version = "0.1.0"
+description = "Ask questions across a library of PDFs and get answers that cite their sources."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Dace" }]
+requires-python = ">=3.10"
+# Core stays light so CI is fast and the logic is importable anywhere.
+dependencies = ["numpy>=1.26", "python-dotenv>=1.0"]
+
+[project.optional-dependencies]
+# Everything needed to actually run the app (heavy: torch, etc.).
+full = [
+    "streamlit>=1.36",
+    "groq>=0.9",
+    "sentence-transformers>=3.0",
+    "pymupdf>=1.24",
+]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/Daceyyreal/paper-chat"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/paper_chat"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
