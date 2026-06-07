@@ -61,7 +61,7 @@ Set in `.env` or the environment:
 | `PC_GROQ_MODEL` | `llama-3.3-70b-versatile` | any current Groq model |
 | `PC_EMBED_MODEL` | `all-MiniLM-L6-v2` | any sentence-transformers model |
 | `PC_TOP_K` | `5` | chunks retrieved per question |
-
+| `PC_LLM_PROVIDER` | `groq`                    | `groq` or `gemini`              |
 ## Roadmap
 
 - [ ] Persist the index to disk so re-ingesting isn't needed each session.
