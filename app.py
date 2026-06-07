@@ -12,11 +12,13 @@ from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv
 
-from paper_chat import config, ingest
-from paper_chat.chat import answer, make_llm
-from paper_chat.store import SentenceTransformerEmbedder, VectorStore
-
+# Load .env BEFORE importing paper_chat modules: config reads env vars at import
+# time, so the .env must be in os.environ first or PC_LLM_PROVIDER is missed.
 load_dotenv()
+
+from paper_chat import config, ingest  # noqa: E402
+from paper_chat.chat import answer, make_llm  # noqa: E402
+from paper_chat.store import SentenceTransformerEmbedder, VectorStore  # noqa: E402
 
 st.set_page_config(page_title="paper-chat", page_icon="📄")
 st.title("📄 paper-chat")
@@ -41,17 +43,28 @@ with st.sidebar:
         added = 0
         with tempfile.TemporaryDirectory() as tmp:
             for up in uploads or []:
-                p = Path(tmp) / up.name
-                p.write_bytes(up.read())
-                chunks = ingest.load_pdf(p, source=Path(up.name).stem)
-                store.add(chunks, embedder)
-                added += len(chunks)
+                try:
+                    p = Path(tmp) / up.name
+                    p.write_bytes(up.getvalue())
+                    chunks = ingest.load_pdf(p, source=Path(up.name).stem)
+                    store.add(chunks, embedder)
+                    added += len(chunks)
+                    if chunks:
+                        st.write(f"• {up.name}: {len(chunks)} chunks")
+                    else:
+                        st.warning(f"• {up.name}: 0 chunks (no extractable text — scanned PDF?)")
+                except Exception as e:  # noqa: BLE001 - surface per-file, don't abort batch
+                    st.error(f"• {up.name}: failed — {e}")
             aid = ingest.parse_arxiv_id(arxiv_in or "")
             if aid:
-                pdf = ingest.fetch_arxiv(aid, Path(tmp))
-                chunks = ingest.load_pdf(pdf, source=f"arXiv:{aid}")
-                store.add(chunks, embedder)
-                added += len(chunks)
+                try:
+                    pdf = ingest.fetch_arxiv(aid, Path(tmp))
+                    chunks = ingest.load_pdf(pdf, source=f"arXiv:{aid}")
+                    store.add(chunks, embedder)
+                    added += len(chunks)
+                    st.write(f"• arXiv:{aid}: {len(chunks)} chunks")
+                except Exception as e:  # noqa: BLE001
+                    st.error(f"• arXiv:{aid}: failed — {e}")
         st.success(f"Indexed {added} chunks. Library now holds {len(store)}.")
     st.metric("Chunks indexed", len(store))
 

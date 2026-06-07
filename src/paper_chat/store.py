@@ -59,4 +59,12 @@ class SentenceTransformerEmbedder:
         self._model = SentenceTransformer(model_name)
 
     def embed(self, texts: list[str]) -> np.ndarray:
-        return np.asarray(self._model.encode(texts, normalize_embeddings=False))
+        return np.asarray(
+            self._model.encode(
+                texts,
+                normalize_embeddings=False,
+                batch_size=64,
+                show_progress_bar=False,
+                convert_to_numpy=True,
+            )
+        )

@@ -29,9 +29,17 @@ class Answer:
 
 
 SYSTEM = (
-    "You answer questions using ONLY the numbered sources below. "
-    "Cite the sources you use inline with their tags, e.g. [S2]. "
-    "If the sources do not contain the answer, say so plainly. Do not invent facts."
+    "You are a research assistant answering questions using ONLY the numbered "
+    "sources below.\n"
+    "Write a thorough, specific answer:\n"
+    "- Draw on as many of the relevant sources as apply, not just one.\n"
+    "- Name concrete details — methods, numbers, terms, mechanisms — rather than "
+    "speaking in generalities.\n"
+    "- When comparing things, spell out the actual points of difference.\n"
+    "- Cite the source for each claim inline with its tag, e.g. [S2], and cite "
+    "every source you draw on.\n"
+    "- If the sources genuinely do not contain the answer, say so plainly and "
+    "state what is missing. Never invent facts beyond the sources."
 )
 
 
@@ -88,30 +96,46 @@ class GroqLLM:
 
 
 class GeminiLLM:
-    """Real LLM backed by the Google Gemini API (lazy import; reads GEMINI_API_KEY)."""
+    """Real LLM backed by the Google Gemini API (lazy import; reads GEMINI_API_KEY).
+
+    Uses the current google-genai SDK and disables "thinking" — for grounded RAG
+    it adds several seconds of latency with no quality gain (measured ~3.6x slower).
+    """
 
     def __init__(self, model: str = GEMINI_MODEL) -> None:
         import os
 
-        import google.generativeai as genai  # lazy
+        from google import genai  # lazy
 
         api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise RuntimeError("Set GEMINI_API_KEY (or GOOGLE_API_KEY) to use the Gemini backend.")
-        genai.configure(api_key=api_key)
-        self._model = genai.GenerativeModel(model)
+        self._client = genai.Client(api_key=api_key)
+        self._model = model
 
     def complete(self, prompt: str) -> str:
-        resp = self._model.generate_content(
-            prompt,
-            generation_config={"temperature": 0.2},
+        from google.genai import types
+
+        resp = self._client.models.generate_content(
+            model=self._model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
         )
         return resp.text or ""
 
 
-def make_llm(provider: str = LLM_PROVIDER) -> LLM:
-    """Construct the configured chat backend. Override with PC_LLM_PROVIDER."""
-    provider = provider.lower()
+def make_llm(provider: str | None = None) -> LLM:
+    """Construct the configured chat backend. Override with PC_LLM_PROVIDER.
+
+    Reads the provider from the environment at call time (not import time) so a
+    .env loaded after this module is imported is still respected.
+    """
+    import os
+
+    provider = (provider or os.getenv("PC_LLM_PROVIDER", LLM_PROVIDER)).lower()
     if provider == "gemini":
         return GeminiLLM()
     if provider == "groq":
