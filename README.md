@@ -32,6 +32,8 @@ numpy vector store (no database to stand up).
 ## Quickstart
 
 ```bash
+git clone https://github.com/Daceyyreal/paper-chat
+cd paper-chat
 pip install -e ".[full]"          # heavy deps: torch, streamlit, pymupdf, groq
 cp .env.example .env              # add your GROQ_API_KEY
 streamlit run app.py
