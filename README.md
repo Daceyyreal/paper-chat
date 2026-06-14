@@ -7,6 +7,8 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+<p align="center"><img src="assets/demo.gif" width="900" alt="paper-chat demo — a cross-paper question answered with per-paper, per-page citations"></p>
+
 Drop in a folder of PDFs (your own papers, the related work you're reading,
 anything from arXiv), ask a question, and get a grounded answer where **every
 claim points back to the source paper and page**. Built to actually use on a
