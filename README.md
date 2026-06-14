@@ -37,7 +37,7 @@ numpy vector store (no database to stand up).
 git clone https://github.com/Daceyyreal/paper-chat
 cd paper-chat
 pip install -e ".[full]"          # heavy deps: torch, streamlit, pymupdf, groq
-cp .env.example .env              # add your GROQ_API_KEY
+cp .env.example .env              # add GROQ_API_KEY — or set PC_LLM_PROVIDER=gemini + GEMINI_API_KEY
 streamlit run app.py
 ```
 
@@ -62,11 +62,14 @@ Set in `.env` or the environment:
 
 | Variable | Default | |
 |----------|---------|--|
-| `GROQ_API_KEY` | — | required |
+| `PC_LLM_PROVIDER` | `groq` | `groq` or `gemini` |
+| `GROQ_API_KEY` | — | required for the `groq` provider |
 | `PC_GROQ_MODEL` | `llama-3.3-70b-versatile` | any current Groq model |
+| `GEMINI_API_KEY` | — | required for the `gemini` provider |
+| `PC_GEMINI_MODEL` | `gemini-2.0-flash` | any current Gemini model |
 | `PC_EMBED_MODEL` | `all-MiniLM-L6-v2` | any sentence-transformers model |
 | `PC_TOP_K` | `5` | chunks retrieved per question |
-| `PC_LLM_PROVIDER` | `groq`                    | `groq` or `gemini`              |
+
 ## Roadmap
 
 - [ ] Persist the index to disk so re-ingesting isn't needed each session.
