@@ -2,6 +2,7 @@
 
 **Ask questions across a library of papers — and get answers that cite their sources.**
 
+[![Release](https://img.shields.io/github/v/release/Daceyyreal/paper-chat?sort=semver)](https://github.com/Daceyyreal/paper-chat/releases/latest)
 [![CI](https://github.com/Daceyyreal/paper-chat/actions/workflows/ci.yml/badge.svg)](https://github.com/Daceyyreal/paper-chat/actions)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
